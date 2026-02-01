@@ -47,7 +47,10 @@ export default function App() {
 
   useEffect(() => {
     fetch("/api/workflows")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      })
       .then((data: { workflows: ApiWorkflow[] }) => {
         const completed = getCompletedSteps();
         const mapped = data.workflows.map((w) =>
