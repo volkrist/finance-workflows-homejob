@@ -5,7 +5,7 @@ import { WorkflowDetail } from "./components/WorkflowDetail";
 
 const STORAGE_KEY = "workflow-completed";
 
-type ApiStep = { id: string; title: string; doneHint: string };
+type ApiStep = { id: string; title: string; status?: string };
 type ApiWorkflow = { id: string; title: string; description?: string; steps: ApiStep[] };
 
 function getCompletedSteps(): Record<string, string[]> {
@@ -31,10 +31,10 @@ function apiWorkflowToWorkflow(api: ApiWorkflow, completedStepIds: string[]): Wo
     id: api.id,
     name: api.title,
     description: api.description,
-    steps: api.steps.map((s) => ({
+    steps: (api.steps || []).map((s) => ({
       id: s.id,
       title: s.title,
-      status: completedStepIds.includes(s.id) ? "completed" : "pending",
+      status: completedStepIds.includes(s.id) ? "completed" : (s.status === "completed" ? "completed" : "pending"),
     })),
   };
 }
@@ -47,19 +47,18 @@ export default function App() {
 
   useEffect(() => {
     fetch("/api/workflows")
-      .then((res) => {
-        if (!res.ok) throw new Error("API error");
-        return res.json();
-      })
-      .then((data: { workflows: ApiWorkflow[] }) => {
-        const completed = getCompletedSteps();
-        const mapped = data.workflows.map((w) =>
-          apiWorkflowToWorkflow(w, completed[w.id] ?? [])
+      .then((res) => res.json())
+      .then((data) => {
+        const list = (data.workflows || []).map((w: ApiWorkflow) =>
+          apiWorkflowToWorkflow(w, getCompletedSteps()[w.id] ?? [])
         );
-        setWorkflows(mapped);
-        if (!selectedId && mapped.length > 0) setSelectedId(mapped[0].id);
+        setWorkflows(list);
+        if (list.length > 0) setSelectedId((prev) => prev ?? list[0].id);
       })
-      .catch((e) => setError(String(e)))
+      .catch((err) => {
+        console.error(err);
+        setError("API error");
+      })
       .finally(() => setLoading(false));
   }, []);
 
