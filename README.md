@@ -24,7 +24,7 @@ npm run dev
 
 ## API
 
-Backend должен быть запущен на http://127.0.0.1:8000
+front https://finance-workflows-homejob-lzgia5tah-alexs-projects-cb770374.vercel.app/
 
 Endpoints used:
 
