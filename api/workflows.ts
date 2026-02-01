@@ -15,10 +15,5 @@ const workflows = [
 ];
 
 export default function handler(_req: VercelRequest, res: VercelResponse) {
-  try {
-    return res.status(200).json({ workflows });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "API crashed" });
-  }
+  return res.status(200).json({ workflows });
 }
