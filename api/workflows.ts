@@ -1,5 +1,6 @@
-export default function handler(req: any, res: any) {
-  res.status(200).json({
-    workflows: [],
-  });
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { workflows } from "./_data";
+
+export default function handler(_req: VercelRequest, res: VercelResponse) {
+  res.status(200).json({ workflows });
 }
